@@ -1,0 +1,15 @@
+<h1>{{ video.file.name }}</h1>
+<video controls height="300">
+    <source src="{{ video.file.url }}" type="video/mp4">
+</video>
+<table>
+    <tr>
+        <th>Start Time</th>
+        <th>Speaker</th>
+        <th>Content</th>
+    </tr>
+    <!-- Loop through transcription and diarization data to populate table -->
+    <!-- Highlight alternate rows, make cursor a pointer -->
+</table>
+<button onclick="exportToDoc()">Export to DOCX</button>
+<button onclick="copyToClipboard()">Copy to Clipboard</button>
