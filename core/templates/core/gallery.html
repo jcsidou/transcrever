@@ -1,10 +1,21 @@
-<h1>Video Transcription Gallery</h1>
-<div>
+{% extends 'core/base.html' %}
+
+{% block title %}Galeria de Transcrições{% endblock %}
+
+{% block content %}
+<h1>Galeria de Transcrições</h1>
+<div class="grid-container">
     {% for video in videos %}
-        <div class="{% if video.is_transcribed %}transcribed{% else %}in-progress{% endif %}">
-            <a href="{% url 'video_detail' video.id %}">
-                {{ video.file.name }} - {{ video.progress }}%
-            </a>
-        </div>
+    <div class="card 
+        {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% else %}in-progress{% endif %}">
+        <h2>{{ video.file.name }}</h2>
+        <p>Duração: {{ video.formatted_duration }}</p>
+        <button 
+            {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
+            onclick="window.location.href='{% url 'video_detail' video.id %}'">
+            Ver Detalhes
+        </button>
+    </div>
     {% endfor %}
 </div>
+{% endblock %}

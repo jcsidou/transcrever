@@ -3,3 +3,12 @@ __pycache__/
 *.pyc 
 *.pyo 
 .env 
+/videos
+/audios
+/core/audios
+/media
+/core/migrations
+/media/videos
+/core/media
+./db.sqlite3
+*.sqlite3

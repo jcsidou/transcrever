@@ -1,0 +1,193 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    color: White;
+}
+
+.navbar {
+    background-color: #222;
+    color: #fff;
+    padding: 0 10px 10px 10px;
+    text-align: center;
+    vertical-align: top;
+    box-shadow: black 4px 4px 8px;  
+}
+
+.navbar a {
+    color: #fff;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+.content {
+    padding: 20px;
+}
+
+h1, .video_div {
+    text-align: center;
+    text-shadow: #111 4px 4px 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #777;
+    color: lightgrey;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: #333 4px 4px 4px;
+}
+
+tr:nth-child(even) {
+    background-color: #111;
+}
+
+.transcriptionTable:hover {
+    background-color:#aaa;
+    cursor: pointer;
+    color: #111;
+}
+
+a, .nav-btn {
+    text-decoration: none;
+}
+
+.nav-btn {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+}
+button, .btn {
+    background-color:darkblue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: black 4px 4px 8px;
+}
+.btn {
+    border-radius: 8px;
+}
+
+button:hover, .btn:hover {
+    background-color: blue;
+}
+
+/* Grid Container */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+/* Card Style */
+.card {
+    /* border: 2px solid white; */
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #ffbd00;
+    box-shadow: black 4px 4px 8px;
+    transition: transform 0.2s;
+    text-align: center;
+    vertical-align: center;
+}
+
+.card h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.card p {
+    margin: 0 0 15px;
+}
+
+.card button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+}
+
+/* Class for Successful Transcription */
+.transcribed {
+    background-color: #999;
+    color:#111;
+}
+
+/* Class for Conversion Error */
+.convert-error {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+/* Class for Transcription Error */
+.transcript-error {
+    border-color: darkred;
+    background-color: #fff3cd;
+}
+
+/* Class for In Progress */
+.in-progress {
+    border-color: #6c757d;
+    color: lightgray;
+    background-color: #444;
+    cursor: not-allowed
+}
+
+/* Disabled Button Style */
+.disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+    cursor: not-allowed
+}
+
+button.disabled {
+    background-color: #6c757d;
+}
+
+button.disabled:hover {
+    background-color: darkgray;
+}
+
+.disabled:hover {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+    cursor: not-allowed
+}
+
+/* Hover Effect */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.navbar-logo {
+    max-height: 50px;
+    width: auto;
+    padding: 0;
+    margin: 0;  
+    margin-top: 10px;
+}
+
+.nav-table {border: 0px;}
+.nav-logo-td {align-items: left; border: 0px;}
+.nav-logo-btn{align-items: right; border: 0px; align-content: rigth; text-align: right;}
