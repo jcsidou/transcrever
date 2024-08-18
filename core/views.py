@@ -17,6 +17,7 @@ from docx.oxml.ns import nsdecls
 from docx.oxml import OxmlElement, ns
 from .models import Video
 from itertools import groupby
+from .tasks import process_video_task  # Importa a tarefa Celery
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 log_message = lambda message: logging.info(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}")
@@ -56,7 +57,9 @@ def upload_video(request):
             log_message(f"Salvando formulario")
             video = form.save()
             messages.success(request, 'Upload bem-sucedido! Você pode ir para a galeria para ver o vídeo.')
+            # process_video_task.delay(video.id)
             process_video(video.id)
+            
             return redirect('gallery')
     else:
         form = VideoUploadForm()

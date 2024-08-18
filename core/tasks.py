@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import torch
 from pyannote.audio import Pipeline
+from celery import shared_task
 import pyannote.audio
 
 # Configurar o logger
@@ -167,28 +168,12 @@ def process_video(video_id):
                     video.error_on_diarization = True
                     log_message(f"Diarização do vídeo {video_id} não retornou nenhum resultado.")
 
-                # diarization_str = ""
-                # for turn, _, speaker in diarization.itertracks(yield_label=True):
-                #     log_message(f"Processando: Speaker {speaker} from {turn.start:.1f}s to {turn.end:.1f}s")
-                #     diarization_str += f"Speaker {speaker} from {turn.start:.1f}s to {turn.end:.1f}s\n"
-                
-                # if diarization_str:
-                #     video.diarization = diarization_str
-                #     video.is_diarized = True
-                #     video.error_on_diarization = False
-                #     log_message(f"Vídeo {video_id} diarizado com sucesso.")
-                # else:
-                #     video.is_diarized = False
-                #     video.error_on_diarization = True
-                #     log_message(f"Diarização do vídeo {video_id} não retornou nenhum resultado.")
-
             except Exception as e:
                 video.error_on_diarization = True
                 log_message(f"Erro ao diarizar vídeo {video_id}: {str(e)}")
                 import traceback
                 log_message(f"Traceback completo: {traceback.format_exc()}")
             finally:
-                
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                     log_message("Memória da GPU liberada após a diarização.")
@@ -219,3 +204,11 @@ def is_gpu_available():
             return False
     return False
 
+@shared_task
+def process_video_task(video_id):
+    try:
+        video = Video.objects.get(id=video_id)
+        video.process_video()  # Supondo que você tenha um método `process_video` no modelo Video
+        log_message(f'Vídeo {video_id} processado com sucesso.')
+    except Video.DoesNotExist:
+        log_message(f'Vídeo {video_id} não encontrado para processamento.')
