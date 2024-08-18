@@ -16,6 +16,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml.ns import nsdecls
 from docx.oxml import OxmlElement, ns
 from .models import Video
+from itertools import groupby
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 log_message = lambda message: logging.info(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}")
@@ -24,9 +25,28 @@ def gallery(request):
     videos = Video.objects.all()
     return render(request, 'core/gallery.html', {'videos': videos})
 
-def video_detail(request, video_id):
-    video = get_object_or_404(Video, id=video_id)
-    return render(request, 'core/video_detail.html', {'video': video})
+# def video_detail(request, video_id):
+#     video = get_object_or_404(Video, id=video_id)
+#     log_message(f"Obtendo os detalhes do vídeo {video.id}")
+#         # Converte a string JSON em uma lista de dicionários, se necessário
+#     if isinstance(video.transcription_phrases, str):
+#         video.transcription_phrases = json.loads(video.transcription_phrases)
+
+#     # Agrupa as palavras pelo orador, se a diarização estiver ativada e não houver erros
+#     if video.diarize and video.word_timestamps and not video.error_on_diarization:
+#         video.word_groups = group_words_by_speaker(video.word_timestamps)
+#         log_message(f"Formados {len(video.word_groups)} grupos de palavras por orador.")
+#     else:
+#         log_message(f"Não foram formados grupos de palavras por orador.")
+#         video.word_groups = None
+    
+#     # Converte o tempo de start e end para HH:MM:ss
+#     for phrase in video.transcription_phrases:
+#         phrase['start'] = format_time(float(phrase['start']))
+#         phrase['end'] = format_time(float(phrase['end']))
+
+#     # Renderiza o template passando o contexto com o vídeo
+#     return render(request, 'core/video_detail.html', {'video': video})
 
 def upload_video(request):
     if request.method == 'POST':
@@ -69,15 +89,9 @@ def format_time(seconds):
 def video_detail_view(request, video_id):
     # Recupera o objeto Video do banco de dados
     video = get_object_or_404(Video, id=video_id)
+    log_message(f"Obtendo os detalhes do vídeo {video.id}")
 
-    # Converte a string JSON em uma lista de dicionários, se necessário
-    if isinstance(video.transcription_phrases, str):
-        video.transcription_phrases = json.loads(video.transcription_phrases)
-
-    # Construa a URL completa usando MEDIA_URL
-    video_url = f"{settings.MEDIA_URL}videos/{os.path.basename(video.file.name)}"
-    
-    # Converte o tempo de start e end para HH:MM:ss
+    # Converte o tempo de start e end para HH:MM:SS
     for phrase in video.transcription_phrases:
         phrase['start'] = format_time(float(phrase['start']))
         phrase['end'] = format_time(float(phrase['end']))
@@ -239,3 +253,77 @@ def delete_transcription(request, video_id):
         messages.success(request, f'Transcrição e arquivos do vídeo "{video.file.name}" excluídos com sucesso.')
 
     return redirect('gallery')  # Redireciona para a galeria após a exclusão
+
+def group_words_by_speaker(diarization, word_timestamps):
+    grouped = []
+    current_speaker = None
+    current_segment = {'speaker': None, 'start': None, 'end': None, 'text': ''}
+
+    for segment in diarization:
+        speaker = segment['speaker']
+        start = segment['start']
+        end = segment['end']
+
+        # Filtra as palavras que estão dentro do intervalo de tempo do segmento de fala
+        words_in_segment = [
+            word for word in word_timestamps 
+            if word['start'] >= start and word['end'] <= end
+        ]
+
+        # Se houver mudança de orador ou se for o primeiro segmento
+        if speaker != current_speaker:
+            # Salva o segmento atual (se não for o primeiro)
+            if current_speaker is not None:
+                grouped.append(current_segment)
+            
+            # Inicia um novo segmento
+            current_speaker = speaker
+            current_segment = {
+                'speaker': speaker,
+                'start': start,
+                'end': end,
+                'text': ' '.join([word['word'] for word in words_in_segment])
+            }
+        else:
+            # Continua o segmento atual
+            current_segment['end'] = end
+            current_segment['text'] += ' ' + ' '.join([word['word'] for word in words_in_segment])
+
+    # Adiciona o último segmento
+    if current_segment['speaker'] is not None:
+        grouped.append(current_segment)
+
+    return grouped
+
+def group_segments_by_speaker(diarization):
+    grouped = []
+    current_speaker = None
+    current_segment = {'speaker': None, 'start': None, 'end': None}
+
+    for segment in diarization:
+        speaker = segment['speaker']
+        start = segment['start']
+        end = segment['end']
+
+        # Se houver mudança de orador ou se for o primeiro segmento
+        if speaker != current_speaker:
+            # Salva o segmento atual (se não for o primeiro)
+            if current_speaker is not None:
+                grouped.append(current_segment)
+            
+            # Inicia um novo segmento
+            current_speaker = speaker
+            current_segment = {
+                'speaker': speaker,
+                'start': start,
+                'end': end
+            }
+        else:
+            # Continua o segmento atual
+            current_segment['end'] = end
+
+    # Adiciona o último segmento
+    if current_segment['speaker'] is not None:
+        grouped.append(current_segment)
+
+    return grouped

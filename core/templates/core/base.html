@@ -6,20 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Transcrever{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
     <nav class="navbar">
-        <table class="nav-table">
-            <tr>
-                <td class="nav-logo-td">
-                    <img src="{% static 'media/logo-branco.png' %}" alt="Logo" class="navbar-logo">
-                </td>
-                <td class="nav-logo-btn">
-                    <a href="{% url 'upload_video' %}" class="btn nav-btn">Upload de Vídeo</a>
-                    <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Transcrições</a>
-                </td>
-            </tr>
-        </table>
+        <div class="flex-container">
+            {% comment %} <div>
+                <img src="{% static 'media/app_logo.png' %}" alt="Logo" class="navbar-logo">
+            </div> {% endcomment %}
+            <div>
+                <h2>Transcritor</h2>
+            </div>
+            <div>
+            </div>
+            <div>
+                <br>
+                <a href="{% url 'upload_video' %}" class="btn nav-btn">Upload de Vídeo</a>
+                <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Transcrições</a>
+            </div>
+            <div>
+                <img src="{% static 'media/logo-branco.png' %}" alt="Logo" class="navbar-logo">
+            </div>
+        </div>
     </nav>
     <div class="content">
         {% block content %}

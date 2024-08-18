@@ -9,132 +9,20 @@
     </video>
 </div>
 <a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
-<table id="transcriptionTable" class="transcript-table">
-    <thead>
-        <tr>
-            <th>Tempo</th>
-            <th>Conteúdo</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for phrase in video.transcription_phrases %}
-        <tr data-start="{{ phrase.start }}" class="transcriptionTable">
-            <td class="time-cell">{{ phrase.start }}</td>
-            <td>{{ phrase.text }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% comment %} <script>
-    document.querySelectorAll('.transcript-table tr').forEach(function(row) {
-        row.addEventListener('click', function() {
-            const video = document.getElementById('videoPlayer');
-            const timeText = row.querySelector('td:first-child').innerText.trim();
-            const timeParts = timeText.split(':').map(Number);
-    
-            let seconds = 0;
-    
-            if (timeParts.length === 3) { 
-                // Formato HH:MM:SS
-                seconds = (timeParts[0] * 3600) + (timeParts[1] * 60) + timeParts[2];
-            } else if (timeParts.length === 2) {  // Correção para "else if"// Formato MM:SS
-                seconds = (timeParts[0] * 60) + timeParts[1];
-            } else if (timeParts.length === 1) {  // Correção para "else if"// Formato SS
-                seconds = timeParts[0];
-            }
-    
-            video.pause(); // Pause o vídeo antes de ajustar o tempo
-    
-            video.addEventListener('loadedmetadata', function() {
-                try {
-                    videoPlayer.currentTime = startTime;
-                } catch (e) {
-                    console.error('Failed to set currentTime:', e);
-                }
-                video.play(); // Reproduza o vídeo após definir o tempo
-            });
-    
-            if (video.readyState >= 2) {
-                video.currentTime = seconds;
-                video.play();
-            } else {
-                video.load(); // Carrega o vídeo se necessário
-            }
-    
-            console.log('Changing video time to:', seconds, 'seconds');
-            console.log('Video Player is at:', videoPlayer.currentTime);
-        });
-    });
-    
-</script> {% endcomment %}
-{% comment %} <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const table = document.getElementById('transcriptionTable');
-        const videoPlayer = document.getElementById('videoPlayer');
-
-        // Log dos valores iniciais
-        console.log('Initial data-start values:');
-        document.querySelectorAll('.transcriptionTable').forEach((row, index) => {
-            console.log(`Row ${index}: data-start = "${row.getAttribute('data-start')}"`);
-        });
-
-        // Formatar os tempos na tabela
-        const timeCells = document.querySelectorAll('.time-cell');
-        timeCells.forEach((cell, index) => {
-            const originalValue = cell.textContent.trim();
-            const seconds = convertTimeToSeconds(originalValue);
-            cell.textContent = formatTime(seconds);
-            const row = cell.closest('tr');
-            row.setAttribute('data-start', seconds);
-            console.log(`Row ${index}: Original = "${originalValue}", Converted = ${seconds}, Formatted = "${formatTime(seconds)}"`);
-        });
-
-        if (table && videoPlayer) {
-            table.addEventListener('click', function (e) {
-                const target = e.target.closest('tr');
-                if (target) {
-                    const startTime = parseFloat(target.getAttribute('data-start'));
-                    console.log('Clicked row start time:', startTime);
-                    if (!isNaN(startTime) && startTime > 0) {
-                        seekAndPlay(startTime);
-                    } else {
-                        console.error('Invalid start time:', target.getAttribute('data-start'));
-                    }
-                }
-            });
-        } else {
-            console.error("Elementos necessários não encontrados na página.");
-        }
-
-        function seekAndPlay(time) {
-            console.log('Seeking to:', time);
-            videoPlayer.currentTime = time;
-            setTimeout(() => {
-                videoPlayer.play().catch(e => console.error('Error playing video:', e));
-            }, 100);  // Ajuste o atraso conforme necessário
-        }
-    });
-
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return 'Tempo inválido';
-        
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-    }
-
-    function convertTimeToSeconds(timeString) {
-        if (typeof timeString === 'number') return timeString;
-        
-        const parts = timeString.split(':');
-        if (parts.length === 3) {
-            return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
-        } else if (parts.length === 2) {
-            return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
-        } else {
-            return parseFloat(timeString);
-        }
-    }
-</script> {% endcomment %}
+    <table id="transcriptionTable" class="transcript-table">
+        <thead>
+            <tr>
+                <th>Tempo</th>
+                <th>Conteúdo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for phrase in video.transcription_phrases %}
+            <tr data-start="{{ phrase.start }}" class="transcriptionTable">
+                <td class="time-cell">{{ phrase.start }}</td>
+                <td>{{ phrase.text }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

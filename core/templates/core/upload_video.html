@@ -6,10 +6,21 @@
 <h1>Novo vídeo</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Transcrever</button>
+    <div class="flex-container">
+        <div> Escolher arquivo: {{ form.file }} </div>
+        <div> Selecionar o modelo: {{ form.model }}</div>
+    {% comment %} <p>{{ form.diarize.label_tag }} {{ form.diarize }}</p> {% endcomment %}
+        <button type="submit" class="btn flex-button">Transcrever</button>
+    </div>
 </form>
-
-{% endif %}
-
+<hr>
+<h2> Lembre-se: </h2>
+Quanto maior o modelo, maior a precisão e, também, o tempo exigido para a transcrição. </br>
+<ul>
+    <li> O modelo <strong>básico</strong> apresenta resultados sofríveis quando a qualidade do áudio não é boa.</li></br>
+    <li> O modelo <strong>médio</strong> apresenta resultados melhores e tempo de resposta adequado a boa parte das situações mais comuns.</li></br>
+    <li> O modelo <strong>grande</strong> melhora bastante a qualidade, chegando próximo do modelo grande aprimorado, mas o tempo de processamento é grande.</li></br>
+    <li> O modelo <strong>grande aprimorado</strong>, em geral, tem resultados bastante próximos ao do modelo grande, exigindo um tempo de processamento bem maior.</li></br>
+</ul>
 {% endblock %}
+

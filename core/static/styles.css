@@ -9,31 +9,31 @@ body {
 .navbar {
     background-color: #222;
     color: #fff;
-    padding: 0 10px 10px 10px;
+    padding: 0px 0px 0px 0px;
     text-align: center;
-    vertical-align: top;
+    vertical-align: bottom;
     box-shadow: black 4px 4px 8px;  
-}
-
-.navbar a {
-    color: #fff;
-    margin: 0 15px;
-    text-decoration: none;
 }
 
 .content {
     padding: 20px;
 }
 
-h1, .video_div {
+h1, h2, .video_div {
     text-align: center;
-    text-shadow: #111 4px 4px 4px;
+    text-shadow: #111 4px 8px 8px;
 }
 
+hr {box-shadow: #111 4px 8px 8px;}
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+}
+.flex-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
 }
 
 table, th, td {
@@ -68,9 +68,9 @@ a, .nav-btn {
 }
 
 .nav-btn {
-    margin-top: 0;
+    margin-top: 10;
     margin-bottom: 0;
-    padding-top: 0;
+    padding-top: 20;
 }
 button, .btn, .delete-btn {
     background-color:darkblue;
@@ -79,6 +79,8 @@ button, .btn, .delete-btn {
     padding: 10px 20px;
     cursor: pointer;
     box-shadow: black 4px 4px 8px;
+    min-width: 100px;
+    font-size:medium;
 }
 .btn {
     border-radius: 8px;

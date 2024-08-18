@@ -13,19 +13,21 @@
             {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
             {% elif video.is_transcribed %} {{ video.formatted_duration }}
             {% else %} Em transcrição. {%endif%} </p>
-        <button 
-            {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
-            onclick="window.location.href='{% url 'video_detail' video.id %}'">
-            Ver Detalhes
-        </button>
-        <button 
-        {% if video.is_transcribed %} class="delete-btn" 
-        {% elif video.error_on_convert %} class="delete-btn" 
-        {% elif video.error_on_transcript %} class="delete-btn" 
-        {% else %} class="disabled" disabled {% endif %}
-            onclick="confirmDeletion('{{ video.file.name }}', '{% url 'delete_transcription' video.id %}')">
-            Excluir
-        </button>
+        <div class="flex-container">
+            <button 
+                {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
+                    onclick="window.location.href='{% url 'video_detail' video.id %}'">
+                    Transcrição
+            </button>
+            <button 
+                {% if video.is_transcribed %} class="delete-btn" 
+                {% elif video.error_on_convert %} class="delete-btn" 
+                {% elif video.error_on_transcript %} class="delete-btn" 
+                {% else %} class="disabled" disabled {% endif %}
+                    onclick="confirmDeletion('{{ video.file.name }}', '{% url 'delete_transcription' video.id %}')">
+                    Excluir
+            </button>
+        </div>
     </div>
     {% endfor %}
 </div>
