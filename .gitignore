@@ -9,3 +9,5 @@ __pycache__/
 /media/audios
 ./db.sqlite3
 *.sqlite3
+db*.*3
+db.sqlite3
