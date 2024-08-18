@@ -5,16 +5,15 @@
 {% block content %}
 <h1>{{ video.file.name }}</h1>
 <div class="video_div">
-    <video id="videoPlayer" controls height="300">
-        <source src="{{ video.file.url }}" type="video/mp4">
+    <video id="videoPlayer" controls muted height="300" source src="{{ video.file.url }}" type="video/mp4">
     </video>
 </div>
 <a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
-<table id="transcriptionTable">
+<table id="transcriptionTable" class="transcript-table">
     <thead>
         <tr>
             <th>Tempo</th>
-            <th>Fala</th>
+            <th>Conteúdo</th>
         </tr>
     </thead>
     <tbody>
@@ -26,8 +25,49 @@
         {% endfor %}
     </tbody>
 </table>
-
 <script>
+    document.querySelectorAll('.transcript-table tr').forEach(function(row) {
+        row.addEventListener('click', function() {
+            const video = document.getElementById('videoPlayer');
+            const timeText = row.querySelector('td:first-child').innerText.trim();
+            const timeParts = timeText.split(':').map(Number);
+    
+            let seconds = 0;
+    
+            if (timeParts.length === 3) { 
+                // Formato HH:MM:SS
+                seconds = (timeParts[0] * 3600) + (timeParts[1] * 60) + timeParts[2];
+            } else if (timeParts.length === 2) {  // Correção para "else if"// Formato MM:SS
+                seconds = (timeParts[0] * 60) + timeParts[1];
+            } else if (timeParts.length === 1) {  // Correção para "else if"// Formato SS
+                seconds = timeParts[0];
+            }
+    
+            video.pause(); // Pause o vídeo antes de ajustar o tempo
+    
+            video.addEventListener('loadedmetadata', function() {
+                try {
+                    videoPlayer.currentTime = startTime;
+                } catch (e) {
+                    console.error('Failed to set currentTime:', e);
+                }
+                video.play(); // Reproduza o vídeo após definir o tempo
+            });
+    
+            if (video.readyState >= 2) {
+                video.currentTime = seconds;
+                video.play();
+            } else {
+                video.load(); // Carrega o vídeo se necessário
+            }
+    
+            console.log('Changing video time to:', seconds, 'seconds');
+            console.log('Video Player is at:', videoPlayer.currentTime);
+        });
+    });
+    
+</script>
+{% comment %} <script>
     document.addEventListener('DOMContentLoaded', function () {
         const table = document.getElementById('transcriptionTable');
         const videoPlayer = document.getElementById('videoPlayer');
@@ -69,7 +109,9 @@
         function seekAndPlay(time) {
             console.log('Seeking to:', time);
             videoPlayer.currentTime = time;
-            videoPlayer.play().catch(e => console.error('Error playing video:', e));
+            setTimeout(() => {
+                videoPlayer.play().catch(e => console.error('Error playing video:', e));
+            }, 100);  // Ajuste o atraso conforme necessário
         }
     });
 
@@ -94,5 +136,5 @@
             return parseFloat(timeString);
         }
     }
-</script>
+</script> {% endcomment %}
 {% endblock %}
