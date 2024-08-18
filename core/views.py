@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.conf import settings
 from .models import Video
 from .forms import VideoUploadForm
@@ -34,6 +35,7 @@ def upload_video(request):
         if form.is_valid():
             log_message(f"Salvando formulario")
             video = form.save()
+            messages.success(request, 'Upload bem-sucedido! Você pode ir para a galeria para ver o vídeo.')
             process_video(video.id)
             return redirect('gallery')
     else:
@@ -85,6 +87,9 @@ def video_detail_view(request, video_id):
 
 def format_duration(duration):
     """Converte um objeto `timedelta` ou `datetime.time` em uma string formatada HH:MM:SS"""
+    if duration is None:
+        return "00:00:00"  # Ou outra string padrão que você prefira para durações desconhecidas
+
     if isinstance(duration, timedelta):
         total_seconds = int(duration.total_seconds())
     elif isinstance(duration, time):
@@ -214,3 +219,23 @@ def gallery_view(request):
         # Certifique-se de que cada vídeo tem a duração formatada
         video.formatted_duration = format_duration(video.duration)
     return render(request, 'core/gallery.html', {'videos': videos})
+
+def delete_transcription(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    # Exclui o vídeo e todos os arquivos relacionados
+    error = False
+    try:
+        video.file.delete()  # Exclui o arquivo de vídeo associado
+    except:
+        error = True
+        log_message(f'Erro ao excluir o arquivo de vídeo: {video.file.name}')
+    try:
+        video.delete()       # Exclui o registro do vídeo no banco de dados
+    except:
+        error = True
+        log_message(f'Erro ao excluir o registr do banco de dados: {video.file.name}')
+        
+    if not error:
+        messages.success(request, f'Transcrição e arquivos do vídeo "{video.file.name}" excluídos com sucesso.')
+
+    return redirect('gallery')  # Redireciona para a galeria após a exclusão

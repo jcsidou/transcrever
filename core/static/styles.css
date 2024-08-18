@@ -72,7 +72,7 @@ a, .nav-btn {
     margin-bottom: 0;
     padding-top: 0;
 }
-button, .btn {
+button, .btn, .delete-btn {
     background-color:darkblue;
     color: white;
     border: none;
@@ -106,6 +106,9 @@ button:hover, .btn:hover {
     transition: transform 0.2s;
     text-align: center;
     vertical-align: center;
+    overflow: hidden;           /* Esconde o texto que ultrapassa o tamanho definido */
+    text-overflow: ellipsis;    /* Adiciona "..." ao final do texto se ele for muito longo */
+    max-width: 100%;   
 }
 
 .card h2 {
@@ -130,18 +133,6 @@ button:hover, .btn:hover {
 .transcribed {
     background-color: #999;
     color:#111;
-}
-
-/* Class for Conversion Error */
-.convert-error {
-    border-color: #dc3545;
-    background-color: #f8d7da;
-}
-
-/* Class for Transcription Error */
-.transcript-error {
-    border-color: darkred;
-    background-color: #fff3cd;
 }
 
 /* Class for In Progress */
@@ -191,3 +182,13 @@ button.disabled:hover {
 .nav-table {border: 0px;}
 .nav-logo-td {align-items: left; border: 0px;}
 .nav-logo-btn{align-items: right; border: 0px; align-content: rigth; text-align: right;}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Class for Conversion Error */
+.transcript-error {
+    border-color: darkred solid 2px;
+    background-color: #777;
+}

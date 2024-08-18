@@ -30,6 +30,8 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 
 def process_video(video_id):
     video = Video.objects.get(id=video_id)
+    if not video.file or not os.path.exists(video.file.path):
+        return
     log_message(f"Iniciando processamento do vídeo {video_id}...")  # Log adicional para iniciar o processo
     if video.is_transcribed:
         log_message(f"Vídeo {video_id} já foi transcrito anteriormente. Ignorando novo processamento.")

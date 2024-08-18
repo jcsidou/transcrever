@@ -3,10 +3,13 @@
 {% block title %}Upload Video{% endblock %}
 
 {% block content %}
-<h1>Fornecer novo vídeo</h1>
+<h1>Novo vídeo</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn">Upload</button>
+    <button type="submit" class="btn">Transcrever</button>
 </form>
+
+{% endif %}
+
 {% endblock %}

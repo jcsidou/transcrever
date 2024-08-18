@@ -9,13 +9,31 @@
     <div class="card 
         {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% else %}in-progress{% endif %}">
         <h2>{{ video.file.name }}</h2>
-        <p>Duração: {{ video.formatted_duration }}</p>
+        <p> {% if video.error_on_convert %} Erro ao converter o vídeo.
+            {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
+            {% elif video.is_transcribed %} {{ video.formatted_duration }}
+            {% else %} Em transcrição. {%endif%} </p>
         <button 
             {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
             onclick="window.location.href='{% url 'video_detail' video.id %}'">
             Ver Detalhes
         </button>
+        <button 
+        {% if video.is_transcribed %} class="delete-btn" 
+        {% elif video.error_on_convert %} class="delete-btn" 
+        {% elif video.error_on_transcript %} class="delete-btn" 
+        {% else %} class="disabled" disabled {% endif %}
+            onclick="confirmDeletion('{{ video.file.name }}', '{% url 'delete_transcription' video.id %}')">
+            Excluir
+        </button>
     </div>
     {% endfor %}
 </div>
+<script>
+    function confirmDeletion(videoName, deleteUrl) {
+        if (confirm(`Tem certeza de que deseja excluir a transcrição e todos os arquivos do vídeo "${videoName}"?`)) {
+            window.location.href = deleteUrl;
+        }
+    }
+</script>
 {% endblock %}
