@@ -209,3 +209,7 @@ button.disabled:hover {
     margin-top: -15px;
     color:#aaa
 }
+
+.time-cell {
+    text-align: center;;
+}
