@@ -23,7 +23,7 @@ class Video(models.Model):
     error_on_transcript = models.BooleanField(default=False)
     error_on_diarization = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    model = models.CharField(max_length=50, choices=MODEL_CHOICES)
+    model = models.CharField(max_length=50, choices=MODEL_CHOICES, default='medium')
     diarize = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):

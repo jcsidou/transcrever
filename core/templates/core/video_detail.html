@@ -3,11 +3,13 @@
 {% block title %}Detalhes do Vídeo{% endblock %}
 
 {% block content %}
-<h1>{{ video.file.name }}</h1>
+<h2>{{ video.file.name }}</h2>
+<div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
 <div class="video_div">
     <video id="videoPlayer" controls muted height="300" source src="{{ video.file.url }}" type="video/mp4">
     </video>
 </div>
+
 <a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
     <table id="transcriptionTable" class="transcript-table">
         <thead>

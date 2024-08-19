@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-
+{% load custom_filters %}
 {% block title %}Galeria de Transcrições{% endblock %}
 
 {% block content %}
@@ -8,12 +8,16 @@
     {% for video in videos %}
     <div class="card 
         {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% else %}in-progress{% endif %}">
-        <h2>{{ video.file.name }}</h2>
+        <div>
+        <h2 class="no-wrap">{{ video.file.name | sem_barra_video }}</h2>
+        </div>
+        <div>
         <p> {% if video.error_on_convert %} Erro ao converter o vídeo.
             {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
             {% elif video.is_transcribed %} {{ video.formatted_duration }}
             {% else %} Em transcrição. {%endif%} </p>
-        <div class="flex-container">
+        </div>
+        <div class="flex-container gallery-button-line">
             <button 
                 {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
                     onclick="window.location.href='{% url 'video_detail' video.id %}'">

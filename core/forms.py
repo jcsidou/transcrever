@@ -9,7 +9,12 @@ class VideoUploadForm(forms.ModelForm):
         title = 'Upload de Vídeo'
         fields = ['file', 'model']
         # fields = ['file', 'model', 'diarize']
-        widgets = {
-            'model': forms.Select(choices=MODEL_CHOICES),
-            # 'diarize': forms.BooleanField(required=False, label="Identificar oradores")
-        }   
+        # widgets = {
+        #     'model': forms.Select(choices=MODEL_CHOICES, attrs={'default': 'medium'})
+        #     # 'diarize': forms.BooleanField(required=False, label="Identificar oradores")
+        # }   
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Define o valor padrão como "medium"
+            self.fields['model'].initial = 'medium'

@@ -20,8 +20,13 @@ body {
 }
 
 h1, h2, .video_div {
+    color: lightgray;
     text-align: center;
-    text-shadow: #111 4px 8px 8px;
+    text-shadow: #111 4px 4px 4px;
+}
+
+.no-wrap {
+    white-space: nowrap;
 }
 
 hr {box-shadow: #111 4px 8px 8px;}
@@ -107,7 +112,11 @@ button:hover, .btn:hover {
     box-shadow: black 4px 4px 8px;
     transition: transform 0.2s;
     text-align: center;
+    display: flex;
+    flex-flow: column;
     vertical-align: center;
+    justify-content: center;
+    /* align-items: center; */
     overflow: hidden;           /* Esconde o texto que ultrapassa o tamanho definido */
     text-overflow: ellipsis;    /* Adiciona "..." ao final do texto se ele for muito longo */
     max-width: 100%;   
@@ -133,15 +142,14 @@ button:hover, .btn:hover {
 
 /* Class for Successful Transcription */
 .transcribed {
-    background-color: #999;
-    color:#111;
+    background-color: #666;
 }
 
 /* Class for In Progress */
 .in-progress {
     border-color: #6c757d;
     color: lightgray;
-    background-color: #444;
+    background-color: #333;
     cursor: not-allowed
 }
 
@@ -193,4 +201,11 @@ button.disabled:hover {
 .transcript-error {
     border-color: darkred solid 2px;
     background-color: #777;
+}
+
+.model_info {
+    font-size: small;
+    text-align: center;
+    margin-top: -15px;
+    color:#aaa
 }
