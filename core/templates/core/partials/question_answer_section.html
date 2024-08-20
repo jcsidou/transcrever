@@ -1,0 +1,21 @@
+{% comment %} <hr> {% endcomment %}
+<h2>Perguntas e Respostas</h2>
+<form id="qaForm" method="post">
+    {% csrf_token %}
+    <div>
+        <label for="question">Faça sua pergunta sobre o conteúdo:</label><br>
+        <input type="text" id="question" name="question" size="100">
+    </div>
+    <br>
+    <button type="submit" class="btn">Obter Resposta</button>
+</form>
+<div id="answerSection">
+    {% if answer %}
+        <div class="answer">
+            <h3>Resposta:</h3>
+            <p>{{ answer }}</p>
+        </div>
+    {% else %}
+        <p>Nenhuma resposta foi gerada.</p>
+    {% endif %}
+</div>

@@ -1,9 +1,9 @@
 {% extends 'core/base.html' %}
-
+{% load custom_filters %}
 {% block title %}Detalhes do Vídeo{% endblock %}
 
 {% block content %}
-<h2>{{ video.file.name }}</h2>
+<h2>{{ video.file.name | sem_barra_video  }}</h2>
 <div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
 <div class="video_div">
     <video id="videoPlayer" controls preload="auto">
@@ -31,22 +31,37 @@
         </tbody>
     </table>
     <hr>
-    <h2>Perguntas e Respostas</h2>
-    <form method="post">
+<div id="qaSection">
+    <form id="qaForm" method="post">
         {% csrf_token %}
         <div>
-            <label for="question">Faça sua pergunta sobre o conteúdo:</label><br>
-            <input type="text" id="question" name="question" size="100">
+            <label for="question">Faça sua pergunta sobre o conteúdo:</label> <br>
+            <input type="text" id="question" name="question" size="100"> <button type="submit" class="btn">Obter Resposta</button>
         </div>
-        <br>
-        <button type="submit" class="btn">Obter Resposta</button>
     </form>
-    {% if answer %}
-        <div class="answer">
-            <h3>Resposta:</h3>
-            <p>{{ answer }}</p>
-        </div>
-    {% else %}
+    <h3>Resposta:</h3>
+    <div id="answerSection">
         <p>Nenhuma resposta foi gerada.</p>
-    {% endif %} 
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#qaForm').submit(function(event) {
+            event.preventDefault(); // Evita o envio padrão do formulário
+
+            $.ajax({
+                url: "{% url 'ajax_question_answer' video.id %}",
+                type: 'POST',
+                dataType: 'json',
+                data: $(this).serialize(),
+                success: function(data) {
+                    // Atualiza a seção de resposta com a resposta recebida
+                    $('#answerSection').html('<p>' + data.answer + '</p>');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

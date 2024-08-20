@@ -1,47 +1,23 @@
 {% extends 'core/base.html' %}
-{% load custom_filters %}
-{% block title %}Galeria de Transcrições{% endblock %}
-
 {% block content %}
 <h1>Galeria de Transcrições</h1>
-<div class="grid-container">
-    {% for video in videos %}
-    <div class="card 
-        {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% else %}in-progress{% endif %}">
-        <div>
-        <h2 class="no-wrap">{{ video.file.name | sem_barra_video }}</h2>
-        </div>
-        <div class = "card-status">
-            <a> 
-                {% if video.error_on_convert %} Erro ao converter o vídeo.
-                {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
-                {% elif video.is_transcribed %} {{ video.formatted_duration }}
-                {% elif video.in_process %} Em transcrição...
-                {% elif video.queue_position %} Na fila (Posição: {{ video.queue_position }})
-                {% else %} Aguardando processamento... {%endif%} 
-            </a>
-        </div>
-        <div class="card-model">
-            {{ video.get_model_display }}
-        </div>
-        <div class="flex-container gallery-button-line">
-            <button 
-                {% if not video.is_transcribed %}class="disabled" disabled{% endif %}
-                    onclick="window.location.href='{% url 'video_detail' video.id %}'">
-                    Transcrição
-            </button>
-            <button
-                {% if video.in_process %} class="disabled" disabled 
-                {% else %} class="delete-btn" 
-                {% endif %}
-                    onclick="confirmDeletion('{{ video.file.name }}', '{% url 'delete_transcription' video.id %}')">
-                    Excluir
-            </button>
-        </div>
-    </div>
-    {% endfor %}
+<div id="gallery" class="grid-container">
+    {% include 'core/partials/gallery_content.html' %}
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    function updateGallery() {
+        $.ajax({
+            url: "{% url 'ajax_gallery_view' %}",
+            success: function(data) {
+                $('#gallery').html(data);
+            }
+        });
+    }
+
+    setInterval(updateGallery, 10000); // Atualiza a cada 10 segundos
+
     function confirmDeletion(videoName, deleteUrl) {
         if (confirm(`Tem certeza de que deseja excluir a transcrição e todos os arquivos do vídeo "${videoName}"?`)) {
             window.location.href = deleteUrl;

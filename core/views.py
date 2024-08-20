@@ -4,7 +4,7 @@ from django.conf import settings
 from .models import Video
 from .forms import VideoUploadForm
 from .tasks import process_video, add_video_to_queue
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta, time
 import docx
 import json
@@ -248,13 +248,6 @@ def generate_docx(request, video_id):
     doc.save(response)
     return response
 
-def gallery_view(request):
-    videos = Video.objects.all()
-    for video in videos:
-        # Certifique-se de que cada vídeo tem a duração formatada
-        video.formatted_duration = format_duration(video.duration)
-    return render(request, 'core/gallery.html', {'videos': videos})
-
 def delete_transcription(request, video_id):
     video = get_object_or_404(Video, id=video_id)
     # Exclui o vídeo e todos os arquivos relacionados
@@ -268,7 +261,7 @@ def delete_transcription(request, video_id):
         video.delete()       # Exclui o registro do vídeo no banco de dados
     except:
         error = True
-        log_message(f'Erro ao excluir o registr do banco de dados: {video.file.name}')
+        log_message(f'Erro ao excluir o registro do banco de dados: {video.file.name}')
         
     if not error:
         messages.success(request, f'Transcrição e arquivos do vídeo "{video.file.name}" excluídos com sucesso.')
@@ -391,3 +384,21 @@ def gallery_view(request):
         # Certifique-se de que cada vídeo tem a duração formatada
         video.formatted_duration = format_duration(video.duration)
     return render(request, 'core/gallery.html', {'videos': videos})
+
+def ajax_gallery_view(request):
+    videos = Video.objects.all()
+    return render(request, 'core/partials/gallery_content.html', {'videos': videos})
+
+def ajax_question_answer(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    answer = None
+
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        if question:
+            # Lógica para processar a pergunta e obter a resposta
+            context = " ".join([phrase['text'] for phrase in video.transcription_phrases])
+            answer = answer_question(question, context)
+
+    # Retornar a resposta em formato JSON
+    return JsonResponse({'answer': answer or "Nenhuma resposta foi gerada."})
