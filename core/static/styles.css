@@ -19,12 +19,24 @@ body {
     padding: 20px;
 }
 
-h1, h2, .video_div {
+h1, h2 {
     color: lightgray;
     text-align: center;
     text-shadow: #111 4px 4px 4px;
+    width: 100%;
 }
 
+.video_div {
+    text-align: center;
+    width: 100%;
+} 
+
+video {
+    height: 320px; 
+    width: 100%;
+    /* background-color: #2a2a2a; */
+    /* box-shadow: #111111 0px 20px 20px 0; */
+}
 .no-wrap {
     white-space: nowrap;
 }
@@ -73,9 +85,9 @@ a, .nav-btn {
 }
 
 .nav-btn {
-    margin-top: 10;
+    margin-top: 10px;
     margin-bottom: 0;
-    padding-top: 20;
+    padding-top: 30px;
 }
 button, .btn, .delete-btn {
     background-color:darkblue;
@@ -212,4 +224,19 @@ button.disabled:hover {
 
 .time-cell {
     text-align: center;;
+}
+
+.card-status {
+    text-shadow: #111 2px 2px 2px;
+}
+
+.card-model {
+    text-shadow: #111 2px 2px 2px;
+    font-size: small;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.nav-div {
+    min-width:140px
 }

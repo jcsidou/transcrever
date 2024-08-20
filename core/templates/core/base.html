@@ -15,17 +15,15 @@
             {% comment %} <div>
                 <img src="{% static 'media/app_logo.png' %}" alt="Logo" class="navbar-logo">
             </div> {% endcomment %}
-            <div>
+            <div class="nav-div">
                 <h2>Transcritor</h2>
             </div>
-            <div>
-            </div>
-            <div>
+            <div class="nav-div">
                 <br>
-                <a href="{% url 'upload_video' %}" class="btn nav-btn">Upload de Vídeo</a>
-                <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Transcrições</a>
+                <a href="{% url 'upload_video' %}" class="btn nav-btn">Novo Vídeo</a>
+                <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Vídeos</a>
             </div>
-            <div>
+            <div class="nav-div">
                 <img src="{% static 'media/logo-branco.png' %}" alt="Logo" class="navbar-logo">
             </div>
         </div>

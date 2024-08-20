@@ -11,11 +11,18 @@
         <div>
         <h2 class="no-wrap">{{ video.file.name | sem_barra_video }}</h2>
         </div>
-        <div>
-        <p> {% if video.error_on_convert %} Erro ao converter o vídeo.
-            {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
-            {% elif video.is_transcribed %} {{ video.formatted_duration }}
-            {% else %} Em transcrição. {%endif%} </p>
+        <div class = "card-status">
+            <a> 
+                {% if video.error_on_convert %} Erro ao converter o vídeo.
+                {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
+                {% elif video.is_transcribed %} {{ video.formatted_duration }}
+                {% elif video.in_process %} Em transcrição...
+                {% elif video.queue_position %} Na fila (Posição: {{ video.queue_position }})
+                {% else %} Aguardando processamento... {%endif%} 
+            </a>
+        </div>
+        <div class="card-model">
+            {{ video.get_model_display }}
         </div>
         <div class="flex-container gallery-button-line">
             <button 
@@ -23,11 +30,10 @@
                     onclick="window.location.href='{% url 'video_detail' video.id %}'">
                     Transcrição
             </button>
-            <button 
-                {% if video.is_transcribed %} class="delete-btn" 
-                {% elif video.error_on_convert %} class="delete-btn" 
-                {% elif video.error_on_transcript %} class="delete-btn" 
-                {% else %} class="disabled" disabled {% endif %}
+            <button
+                {% if video.in_process %} class="disabled" disabled 
+                {% else %} class="delete-btn" 
+                {% endif %}
                     onclick="confirmDeletion('{{ video.file.name }}', '{% url 'delete_transcription' video.id %}')">
                     Excluir
             </button>

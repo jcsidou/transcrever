@@ -6,7 +6,8 @@
 <h2>{{ video.file.name }}</h2>
 <div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
 <div class="video_div">
-    <video id="videoPlayer" controls muted height="300" source src="{{ video.file.url }}" type="video/mp4">
+    <video id="videoPlayer" controls preload="auto">
+        <source src="{{ video.file.url }}" type="video/mp4">
     </video>
 </div>
 
@@ -20,11 +21,32 @@
         </thead>
         <tbody>
             {% for phrase in video.transcription_phrases %}
-            <tr data-start="{{ phrase.start }}" class="transcriptionTable">
-                <td class="time-cell">{{ phrase.start }}</td>
-                <td>{{ phrase.text }}</td>
-            </tr>
+                {% if phrase.text.strip %}
+                <tr data-start="{{ phrase.start }}" class="transcriptionTable">
+                    <td class="time-cell">{{ phrase.start }}</td>
+                    <td>{{ phrase.text }}</td>
+                </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
+    <hr>
+    <h2>Perguntas e Respostas</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="question">Faça sua pergunta sobre o conteúdo:</label><br>
+            <input type="text" id="question" name="question" size="100">
+        </div>
+        <br>
+        <button type="submit" class="btn">Obter Resposta</button>
+    </form>
+    {% if answer %}
+        <div class="answer">
+            <h3>Resposta:</h3>
+            <p>{{ answer }}</p>
+        </div>
+    {% else %}
+        <p>Nenhuma resposta foi gerada.</p>
+    {% endif %} 
 {% endblock %}

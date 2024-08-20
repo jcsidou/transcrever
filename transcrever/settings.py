@@ -19,6 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+ALLOWED_HOSTS = ['179.219.148.212', '127.0.0.1', 'localhost']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -29,7 +30,6 @@ SECRET_KEY = 'django-insecure-*6j=ek5iba-vae%j!t*#)mlbco7l#_nfm-uhb1f@(awa78#!))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
 

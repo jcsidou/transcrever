@@ -10,6 +10,8 @@ import torch
 from pyannote.audio import Pipeline
 from celery import shared_task
 import pyannote.audio
+import threading
+from queue import Queue
 
 # Configurar o logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -24,13 +26,17 @@ log_message(f"Dispositivo de processamento: {'GPU' if device == 'cuda' else 'CPU
 # AUDIO_DIR = os.path.join(os.path.dirname(__file__), 'audios')
 VIDEO_DIR = 'videos/'
 AUDIO_DIR = 'media/audios/'
-
 # Certifique-se de que o diretório de áudios existe
 os.makedirs(AUDIO_DIR, exist_ok=True)
+
+# Fila de processamento
+video_queue = Queue()
 
 def process_video(video_id):
     log_message(f"Iniciando processamento do vídeo {video_id}...")  # Log adicional para iniciar o processo
     video = Video.objects.get(id=video_id)
+    video.in_process = True 
+    video.save()
     if not video.file or not os.path.exists(video.file.path):
         return
     
@@ -177,12 +183,14 @@ def process_video(video_id):
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                     log_message("Memória da GPU liberada após a diarização.")
+        video.in_process = False
         video.save()
         os.remove(mp3_path)
         log_message(f"Arquivo de áudio {mp3_path} removido após a transcrição.")
     
     except Exception as e:
         log_message(f"Erro geral ao processar o vídeo {video_id}: {e}")
+        video.in_process = False
         video.save()
                 
 def process_videos_in_parallel(video_ids):
@@ -212,3 +220,26 @@ def process_video_task(video_id):
         log_message(f'Vídeo {video_id} processado com sucesso.')
     except Video.DoesNotExist:
         log_message(f'Vídeo {video_id} não encontrado para processamento.')
+        
+def worker():
+    while True:
+        video_id = video_queue.get()
+        try:
+            process_video(video_id)
+        finally:
+            video_queue.task_done()
+            
+def add_video_to_queue(video_id):
+    log_message(f"Adicionando vídeo {video_id} à fila.")
+    video_queue.put(video_id)
+
+# Iniciar o worker em uma nova thread
+def start_worker():
+    threading.Thread(target=worker, daemon=True).start()
+
+def reset_in_process_state():
+    Video.objects.filter(in_process=True).update(in_process=False)
+    
+reset_in_process_state()
+# Iniciar o worker ao carregar o módulo
+start_worker()

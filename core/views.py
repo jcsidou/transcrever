@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.conf import settings
 from .models import Video
 from .forms import VideoUploadForm
-from .tasks import process_video
+from .tasks import process_video, add_video_to_queue
 from django.http import HttpResponse
 from datetime import datetime, timedelta, time
 import docx
@@ -18,9 +18,16 @@ from docx.oxml import OxmlElement, ns
 from .models import Video
 from itertools import groupby
 from .tasks import process_video_task  # Importa a tarefa Celery
+from transformers import AutoTokenizer, AutoModelForQuestionAnswering
+import torch
+from .tasks import video_queue
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 log_message = lambda message: logging.info(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}")
+
+# Inicialização do modelo e tokenizer
+tokenizer = AutoTokenizer.from_pretrained("pierreguillou/bert-large-cased-squad-v1.1-portuguese")
+model = AutoModelForQuestionAnswering.from_pretrained("pierreguillou/bert-large-cased-squad-v1.1-portuguese")
 
 def gallery(request):
     videos = Video.objects.all()
@@ -51,15 +58,11 @@ def gallery(request):
 
 def upload_video(request):
     if request.method == 'POST':
-        log_message(f"Postando arquivo ({request.FILES['file'].name})")
         form = VideoUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            log_message(f"Salvando formulario")
             video = form.save()
-            messages.success(request, 'Upload bem-sucedido! Você pode ir para a galeria para ver o vídeo.')
-            # process_video_task.delay(video.id)
-            process_video(video.id)
-            
+            messages.success(request, 'Upload bem-sucedido! O vídeo será processado em breve.')
+            add_video_to_queue(video.id)
             return redirect('gallery')
     else:
         form = VideoUploadForm()
@@ -94,13 +97,28 @@ def video_detail_view(request, video_id):
     video = get_object_or_404(Video, id=video_id)
     log_message(f"Obtendo os detalhes do vídeo {video.id}")
 
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        log_message(f"Pergunta recebida: {question}")
+        
+        if question:
+            context = " ".join([phrase['text'] for phrase in video.transcription_phrases])
+            log_message(f"Contexto gerado: {context[:500]}...")  # Mostra uma parte do contexto
+            answer = answer_question(question, context)
+            log_message(f"Resposta obtida: {answer}")
+        else:
+            answer = "Nenhuma pergunta foi fornecida."
+            log_message("Nenhuma pergunta fornecida")
+    else:
+        answer = None
+        log_message("Método GET utilizado, sem processamento de pergunta")
     # Converte o tempo de start e end para HH:MM:SS
     for phrase in video.transcription_phrases:
         phrase['start'] = format_time(float(phrase['start']))
         phrase['end'] = format_time(float(phrase['end']))
 
     # Renderiza o template passando o contexto com o vídeo
-    return render(request, 'core/video_detail.html', {'video': video})
+    return render(request, 'core/video_detail.html', {'video': video, 'answer': answer})
 
 def format_duration(duration):
     """Converte um objeto `timedelta` ou `datetime.time` em uma string formatada HH:MM:SS"""
@@ -330,3 +348,46 @@ def group_segments_by_speaker(diarization):
         grouped.append(current_segment)
 
     return grouped
+def split_context(context, max_len=512):
+    tokens = tokenizer.tokenize(context)
+    return [" ".join(tokens[i:i+max_len]) for i in range(0, len(tokens), max_len)]
+
+def answer_question(question, context):
+    log_message("Iniciando processamento da pergunta")
+
+    # Limitar o contexto ao máximo de 512 tokens (removendo tokens além do limite)
+    inputs = tokenizer(question, context, truncation=True, max_length=512, add_special_tokens=True, return_tensors="pt")
+    log_message(f"Inputs gerados: {inputs}")
+
+    input_ids = inputs["input_ids"].tolist()[0]
+    log_message(f"Input IDs: {input_ids}")
+
+    outputs = model(**inputs)
+    log_message(f"Outputs gerados: {outputs}")
+
+    answer_start_scores = outputs.start_logits
+    answer_end_scores = outputs.end_logits
+
+    answer_start = torch.argmax(answer_start_scores)  # Índice de início da resposta
+    answer_end = torch.argmax(answer_end_scores) + 1  # Índice de fim da resposta
+    log_message(f"Answer start: {answer_start}, Answer end: {answer_end}")
+
+    answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(input_ids[answer_start:answer_end]))
+    log_message(f"Resposta gerada: {answer}")
+
+    return answer
+
+def gallery_view(request):
+    videos = Video.objects.all()
+    video_queue_list = list(video_queue.queue)  # Converte a fila em uma lista para consulta
+    for video in videos:
+        # Verifica se o vídeo estava em processamento antes de um reinício e se não está na fila
+        if video.in_process and video.id not in video_queue_list:
+            video.queue_position = 1  # Considera como em transcrição, mesmo após o reinício
+        elif video.id in video_queue_list:
+            video.queue_position = video_queue_list.index(video.id) + 1  # Calcula a posição na fila
+        else:
+            video.queue_position = None  # Se o vídeo não estiver na fila, não tem posição
+        # Certifique-se de que cada vídeo tem a duração formatada
+        video.formatted_duration = format_duration(video.duration)
+    return render(request, 'core/gallery.html', {'videos': videos})

@@ -25,6 +25,7 @@ class Video(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     model = models.CharField(max_length=50, choices=MODEL_CHOICES, default='medium')
     diarize = models.BooleanField(default=False)
+    in_process = models.BooleanField(default=False) 
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
