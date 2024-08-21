@@ -1,3 +1,4 @@
+{% load static %}
 {% load custom_filters %}
 {% for video in videos %}
 <div id="card-{{ video.id }}" class="card 
@@ -5,6 +6,7 @@
     <div>
         <h2 class="no-wrap">{{ video.file.name | sem_barra_video }}</h2>
     </div>
+   
     <div class="card-status">
         <a> 
             {% if video.error_on_convert %} Erro ao converter o vídeo.

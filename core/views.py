@@ -387,6 +387,12 @@ def gallery_view(request):
 
 def ajax_gallery_view(request):
     videos = Video.objects.all()
+    for video in videos:
+        # Calcular a duração formatada para cada vídeo
+        if video.duration:
+            video.formatted_duration = video.duration.strftime('%H:%M:%S')
+        else:
+            video.formatted_duration = "00:00:00"
     return render(request, 'core/partials/gallery_content.html', {'videos': videos})
 
 def ajax_question_answer(request, video_id):

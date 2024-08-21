@@ -1,5 +1,5 @@
 {% load static %}
-{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,8 +20,11 @@
             </div>
             <div class="nav-div">
                 <br>
-                <a href="{% url 'upload_video' %}" class="btn nav-btn">Novo Vídeo</a>
-                <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Vídeos</a>
+                {% comment %} <a href="{% url 'upload_video' %}" class="btn nav-btn">Novo Vídeo</a> {% endcomment %}
+                {% if request.resolver_match.url_name != 'gallery' %}
+                    <a href="{% url 'gallery' %}" class="btn nav-btn">Galeria de Vídeos</a>
+                {% endif %}
+                <button id="uploadButton" class="btn nav-btn">Novo vídeo</button> <!-- Novo botão -->
             </div>
             <div class="nav-div">
                 <img src="{% static 'media/logo-branco.png' %}" alt="Logo" class="navbar-logo">
@@ -32,5 +35,51 @@
         {% block content %}
         {% endblock %}
     </div>
+    <div id="uploadPopup" class="popup-overlay">
+        <div class="popup-content">
+            <span id="closePopup" class="close-btn">&times;</span>
+            <h1>Novo vídeo</h1>
+            <form id="popupUploadForm" method="post" enctype="multipart/form-data" action="{% url 'upload_video' %}">
+                {% csrf_token %}
+                <div class="flex-container">
+                    <div>Escolher arquivo: <input type="file" name="file" required></div>
+                    <div>Selecionar o modelo:
+                        <select name="model" required>
+                            <option value="large-v3">Grande aprimorado</option>
+                            <option value="large">Grande</option>
+                            <option value="medium">Médio</option>
+                            <option value="base">Básico</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn flex-button">Transcrever</button>
+                </div>
+            </form>
+            <hr>
+            <h2> Lembre-se: </h2>
+            Quanto maior o modelo, maior a precisão e, também, o tempo exigido para a transcrição. </br>
+            <ul>
+                <li> O modelo <strong>básico</strong> apresenta resultados sofríveis quando a qualidade do áudio não é boa.</li></br>
+                <li> O modelo <strong>médio</strong> apresenta resultados melhores e tempo de resposta adequado a boa parte das situações mais comuns.</li></br>
+                <li> O modelo <strong>grande</strong> melhora bastante a qualidade, chegando próximo do modelo grande aprimorado, mas o tempo de processamento é grande.</li></br>
+                <li> O modelo <strong>grande aprimorado</strong>, em geral, tem resultados bastante próximos ao do modelo grande, exigindo um tempo de processamento bem maior.</li></br>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
+<script>
+    document.getElementById("uploadButton").addEventListener("click", function() {
+        document.getElementById("uploadPopup").style.display = "flex";
+    });
+
+    document.getElementById("closePopup").addEventListener("click", function() {
+        document.getElementById("uploadPopup").style.display = "none";
+    });
+
+    // Fecha o popup se clicar fora dele
+    window.addEventListener("click", function(event) {
+        if (event.target == document.getElementById("uploadPopup")) {
+            document.getElementById("uploadPopup").style.display = "none";
+        }
+    });
+</script>
