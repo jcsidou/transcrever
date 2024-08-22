@@ -326,3 +326,40 @@ button.disabled:hover {
         transform: rotate(360deg);
     }
 }
+
+#question {
+    /* width: 100%; */
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: lightgray;
+}
+
+#question:focus {
+    border-color: #007bff;
+    outline: none;
+    background-color: white;
+}
+
+.question-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaçamento entre o label e o input */
+}
+
+.question-container label {
+    flex-shrink: 0; /* Impede que o label encolha */
+}
+
+.question-container input {
+    flex-grow: 1; /* Faz o input crescer para ocupar o espaço restante */
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.qaDiv {width: 100%;}

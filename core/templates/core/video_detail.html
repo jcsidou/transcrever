@@ -4,6 +4,7 @@
 
 {% block content %}
 <h2>{{ video.file.name | sem_barra_video  }}</h2>
+<p class="model_info">({{video.get_model_display}})</p>
 {% comment %} <div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
 <div class="video_div">
     <video id="videoPlayer" controls preload="auto">

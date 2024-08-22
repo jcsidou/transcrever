@@ -2,12 +2,13 @@
 <h2>Perguntas e Respostas</h2>
 <form id="qaForm" method="post">
     {% csrf_token %}
-    <div>
-        <label for="question">Faça sua pergunta sobre o conteúdo:</label><br>
-        <input type="text" id="question" name="question" size="100">
+    <div class="qaDiv">
+        <div class="question-container">
+            <label for="question">Faça sua pergunta sobre o conteúdo:</label>
+            <input type="text" id="question" name="question" size="100">
+        </div>
+        <button type="submit" class="btn">Obter Resposta</button>
     </div>
-    <br>
-    <button type="submit" class="btn">Obter Resposta</button>
 </form>
 <div id="answerSection">
     {% if answer %}
