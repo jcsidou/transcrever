@@ -13,8 +13,9 @@
             {% elif video.error_on_transcript %} Erro ao transcrever o vídeo.
             {% elif video.is_transcribed %} {{ video.formatted_duration }}
             {% elif video.in_process %} Em transcrição...
-            {% elif video.queue_position %} Na fila (Posição: {{ video.queue_position }})
-            {% else %} Aguardando processamento... {%endif%} 
+            {% elif video.queue_position %} Na fila (posição: {{ video.queue_position }})
+            {% else %} Falha no processamento da fila. {{ video.queue_position }}
+            {% endif %}
         </a>
     </div>
     <div class="card-model">

@@ -33,29 +33,6 @@ def gallery(request):
     videos = Video.objects.all()
     return render(request, 'core/gallery.html', {'videos': videos})
 
-# def video_detail(request, video_id):
-#     video = get_object_or_404(Video, id=video_id)
-#     log_message(f"Obtendo os detalhes do vídeo {video.id}")
-#         # Converte a string JSON em uma lista de dicionários, se necessário
-#     if isinstance(video.transcription_phrases, str):
-#         video.transcription_phrases = json.loads(video.transcription_phrases)
-
-#     # Agrupa as palavras pelo orador, se a diarização estiver ativada e não houver erros
-#     if video.diarize and video.word_timestamps and not video.error_on_diarization:
-#         video.word_groups = group_words_by_speaker(video.word_timestamps)
-#         log_message(f"Formados {len(video.word_groups)} grupos de palavras por orador.")
-#     else:
-#         log_message(f"Não foram formados grupos de palavras por orador.")
-#         video.word_groups = None
-    
-#     # Converte o tempo de start e end para HH:MM:ss
-#     for phrase in video.transcription_phrases:
-#         phrase['start'] = format_time(float(phrase['start']))
-#         phrase['end'] = format_time(float(phrase['end']))
-
-#     # Renderiza o template passando o contexto com o vídeo
-#     return render(request, 'core/video_detail.html', {'video': video})
-
 def upload_video(request):
     if request.method == 'POST':
         form = VideoUploadForm(request.POST, request.FILES)
@@ -113,6 +90,18 @@ def video_detail_view(request, video_id):
         answer = None
         log_message("Método GET utilizado, sem processamento de pergunta")
     # Converte o tempo de start e end para HH:MM:SS
+    seen_phrases = set()
+    unique_phrases = []
+    for phrase in video.transcription_phrases:
+        if phrase['text'] not in seen_phrases:
+            seen_phrases.add(phrase['text'])
+            unique_phrases.append(phrase)
+    
+    context = {
+        'video': video,
+        'unique_phrases': unique_phrases
+    }
+    
     for phrase in video.transcription_phrases:
         phrase['start'] = format_time(float(phrase['start']))
         phrase['end'] = format_time(float(phrase['end']))
@@ -341,6 +330,7 @@ def group_segments_by_speaker(diarization):
         grouped.append(current_segment)
 
     return grouped
+
 def split_context(context, max_len=512):
     tokens = tokenizer.tokenize(context)
     return [" ".join(tokens[i:i+max_len]) for i in range(0, len(tokens), max_len)]
@@ -387,13 +377,41 @@ def gallery_view(request):
 
 def ajax_gallery_view(request):
     videos = Video.objects.all()
+    video_queue_list = list(video_queue.queue)
     for video in videos:
         # Calcular a duração formatada para cada vídeo
         if video.duration:
             video.formatted_duration = video.duration.strftime('%H:%M:%S')
         else:
             video.formatted_duration = "00:00:00"
+        
+        if video.in_process and video.id not in video_queue_list:
+            video.queue_position = 1  # Considera como em transcrição, mesmo após o reinício
+        elif video.id in video_queue_list:
+            video.queue_position = video_queue_list.index(video.id) + 1  # Calcula a posição na fila
+        else:
+            video.queue_position = None
     return render(request, 'core/partials/gallery_content.html', {'videos': videos})
+
+def update_transcription_table(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    video.formatted_duration = format_duration(video.duration)
+        
+    log_message(f"Convertendo o tempo das falas")
+    for phrase in video.transcription_phrases:
+        phrase['start'] = format_time(float(phrase['start']))
+        phrase['end'] = format_time(float(phrase['end']))
+    
+    toggle_prob = request.GET.get('toggleProb', 'off') == 'on'
+    # toggle_prob = request.GET.get('toggleProb', 'on') == 'off'
+    log_message(f"Atualizando transcrição. Exibir probabilidade: {toggle_prob}")
+    
+    context = {
+        'video': video,
+        'toggle_prob': toggle_prob,
+    }
+
+    return render(request, 'core/partials/transcription_table.html', context)
 
 def ajax_question_answer(request, video_id):
     video = get_object_or_404(Video, id=video_id)

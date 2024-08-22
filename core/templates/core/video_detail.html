@@ -4,33 +4,37 @@
 
 {% block content %}
 <h2>{{ video.file.name | sem_barra_video  }}</h2>
-<div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
+{% comment %} <div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
 <div class="video_div">
     <video id="videoPlayer" controls preload="auto">
         <source src="{{ video.file.url }}" type="video/mp4">
     </video>
-</div>
+</div> {% endcomment %}
 
-<a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
-    <table id="transcriptionTable" class="transcript-table">
-        <thead>
-            <tr>
-                <th>Tempo</th>
-                <th>Conteúdo</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for phrase in video.transcription_phrases %}
-                {% if phrase.text.strip %}
-                <tr data-start="{{ phrase.start }}" class="transcriptionTable">
-                    <td class="time-cell">{{ phrase.start }}</td>
-                    <td>{{ phrase.text }}</td>
-                </tr>
-                {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-    <hr>
+<div id="videoContainer" style="display: none;">
+    <div class="video_div">
+        <video id="videoPlayer" controls preload="auto">
+            <source src="{{ video.file.url }}" type="video/mp4">
+        </video>
+    </div>
+</div>
+<div class="flex-container">
+    <div>
+        <a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
+    </div>
+    <div>
+        <label for="toggleProb" class="toggle-label">Exibir Indicador de Certeza</label>
+        <input type="checkbox" id="toggleProb" class="toggle-button">
+    </div>
+    <div>
+        <label for="toggleVideo" class="toggle-label">Exibir Vídeo</label>
+        <input type="checkbox" id="toggleVideo" class="toggle-button">
+    </div>
+</div>
+<div id="transcriptionTableContainer">
+    {% include 'core/partials/transcription_table.html' %}
+</div>
+<hr>
 <div id="qaSection">
     <form id="qaForm" method="post">
         {% csrf_token %}
@@ -44,24 +48,98 @@
         <p>Nenhuma resposta foi gerada.</p>
     </div>
 </div>
+<div id="loadingPopup" class="popup-overlay">
+    <div class="popup-content centered-pop-up">
+        <span id="closeLoadingPopup" class="close-btn">&times;</span>
+        <p>Aguarde enquanto o vídeo está sendo carregado...</p>
+        <div class="spinner"></div> <!-- Spinner de carregamento -->
+    </div>
+</div>
+
+<div id="updatePopup" class="popup-overlay">
+    <div class="popup-content centered-pop-up">
+        <span id="closeLoadingPopup" class="close-btn">&times;</span>
+        <p>A transcrição está sendo atualizada de acordo com as configurações de exibição de probabilidades...</p>
+        <p> Por favor, aguarde.</p>
+        <div class="spinner"></div> 
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#qaForm').submit(function(event) {
-            event.preventDefault(); // Evita o envio padrão do formulário
+        $('#toggleVideo').change(function() {
+            if ($(this).is(':checked')) {
+                $('#loadingPopup').show(); // Exibe o pop-up de carregamento
+                $('#videoContainer').show(); // Exibe o container do vídeo
+                
+                const videoPlayer = $('#videoPlayer').get(0);
+                
+                videoPlayer.oncanplay = function() {
+                    $('#loadingPopup').hide(); // Esconde o pop-up quando o vídeo estiver pronto
+                };
+                
+                videoPlayer.load(); // Carrega o vídeo
+        
+            } else {
+                $('#videoContainer').hide(); // Esconde o container do vídeo
+                $('#loadingPopup').hide(); // Esconde o pop-up caso o toggle seja desmarcado
+            }
+        });
 
+        // Adicione a funcionalidade do botão de fechar
+        $('#closeLoadingPopup').click(function() {
+            $('#loadingPopup').hide();
+        });
+
+        // Fecha o popup se clicar fora dele
+        window.addEventListener("click", function(event) {
+            if (event.target == document.getElementById("loadingPopup")) {
+                document.getElementById("loadingPopup").style.display = "none";
+            }
+        });
+
+        $('#toggleProb').change(function() {
+            updateTable();
+        });
+
+        function updateTable() {
+            $('#updatePopup').fadeIn();  
+            let toggleState = $('#toggleProb').is(':checked') ? 'on' : 'off';
+
+            $.ajax({
+                url: "{% url 'update_transcription_table' video.id %}",
+                type: 'GET',
+                data: {
+                    'toggleProb': toggleState
+                },
+                success: function(data) {
+                    $('#transcriptionTableContainer').html(data);
+                    $('#updatePopup').fadeOut();
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error: ' + status + error);
+                    $('#updatePopup').fadeOut();
+                }
+            });
+        }
+
+        $('#qaForm').submit(function(event) {
+            event.preventDefault();
             $.ajax({
                 url: "{% url 'ajax_question_answer' video.id %}",
                 type: 'POST',
                 dataType: 'json',
                 data: $(this).serialize(),
                 success: function(data) {
-                    // Atualiza a seção de resposta com a resposta recebida
                     $('#answerSection').html('<p>' + data.answer + '</p>');
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error: ' + status + error);
                 }
             });
         });
     });
 </script>
+
 {% endblock %}

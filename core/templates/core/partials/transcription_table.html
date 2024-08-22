@@ -1,0 +1,42 @@
+<table id="transcriptionTable" class="transcript-table">
+    <thead>
+        <tr>
+            <th>Tempo</th>
+            <th>Conteúdo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for phrase in video.transcription_phrases %}
+            {% if phrase.text.strip %}
+            <tr data-start="{{ phrase.start }}" class="transcriptionTable">
+                <td class="time-cell">{{ phrase.start }}</td>
+                <td>
+                    {% for segment in video.transcription_segments %}
+                        {% if segment.id == phrase.id %}
+                            {% if not toggle_prob %}
+                                <!-- Renderização padrão do texto sem classificação -->
+                                {{ phrase.text }}
+                            {% else %}
+                                <!-- Renderização do texto com classificação -->
+                                {% for word in segment.words %}
+                                    {% if word.probability < 0.5 %}
+                                        <span class="prob-60">{{ word.word }}</span>
+                                    {% elif word.probability < 0.65 %}
+                                        <span class="prob-70">{{ word.word }}</span>
+                                    {% elif word.probability < 0.75 %}
+                                        <span class="prob-80">{{ word.word }}</span>
+                                    {% elif word.probability < 0.85 %}
+                                        <span class="prob-90">{{ word.word }}</span>
+                                    {% else %}
+                                        {{ word.word }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>

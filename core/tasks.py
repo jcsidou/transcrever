@@ -77,7 +77,6 @@ def process_video(video_id):
             log_message(f"Definindo o modelo: {video.model}")
             model = whisper.load_model(video.model).to(device)
 
-            log_message(f"Versão da pyannote.audio: {pyannote.audio.__version__}")
             result = model.transcribe(mp3_path, fp16=False, language='pt', word_timestamps=True)  # Força a transcrição para Português do Brasil
             log_message(f"Transcrição do Vídeo {video_id} concluída.")
             
@@ -136,6 +135,7 @@ def process_video(video_id):
         else:
             try:
                 log_message(f"Iniciando a diarização do Vídeo {video_id}...")
+                log_message(f"Versão da pyannote.audio: {pyannote.audio.__version__}")
                 log_message(f"Tamanho do arquivo MP3: {os.path.getsize(mp3_path)} bytes")
                 log_message(f"Duração do áudio: {AudioSegment.from_mp3(mp3_path).duration_seconds} segundos")
                 
