@@ -61,10 +61,13 @@ def process_video(video_id):
                 return
 
             # Converter o vídeo para MP3 e salvar no diretório de áudios
+            log_message(f"Iniciando a conversão do Vídeo {video_id} para MP3 em {mp3_path}...")
+            video.process_times['conversion_start'] = format_datetime(datetime.now())
             audio = AudioSegment.from_file(video.file.path)
             audio.export(mp3_path, format="mp3")
             video.error_on_convert = False
             log_message(f"Vídeo {video_id} convertido para MP3 com sucesso em {mp3_path}.")
+            video.process_times['conversion_end'] = format_datetime(datetime.now())
         except Exception as convert_error:
             video.error_on_convert = True
             log_message(f"Erro na conversão do vídeo {video_id} para MP3: {convert_error}")
@@ -76,10 +79,11 @@ def process_video(video_id):
             log_message(f"Iniciando a transcrição do Vídeo {video_id}...")
             log_message(f"Definindo o modelo: {video.model}")
             model = whisper.load_model(video.model).to(device)
-
+            video.process_times['transcription_device'] = "GPU" if torch.cuda.is_available() else "CPU"
+            video.process_times['transcription_start'] = format_datetime(datetime.now())
             result = model.transcribe(mp3_path, fp16=False, language='pt', word_timestamps=True)  # Força a transcrição para Português do Brasil
+            video.process_times['transcription_end'] = format_datetime(datetime.now())
             log_message(f"Transcrição do Vídeo {video_id} concluída.")
-            
             log_message(f"Salvando o texto...")
             video.transcription = result['text']
             
@@ -135,6 +139,7 @@ def process_video(video_id):
         else:
             try:
                 log_message(f"Iniciando a diarização do Vídeo {video_id}...")
+                video.process_times['diarization_start'] = format_datetime(datetime.now())
                 log_message(f"Versão da pyannote.audio: {pyannote.audio.__version__}")
                 log_message(f"Tamanho do arquivo MP3: {os.path.getsize(mp3_path)} bytes")
                 log_message(f"Duração do áudio: {AudioSegment.from_mp3(mp3_path).duration_seconds} segundos")
@@ -146,6 +151,7 @@ def process_video(video_id):
                     log_message("Usando GPU para diarização.")
                 else:
                     log_message("GPU não disponível. Usando CPU para diarização.")
+                video.process_times['diarization_device'] = "GPU" if torch.cuda.is_available() else "CPU"
                 
                 log_message("Iniciando a diarização...")
                 diarization = diarization_pipeline(mp3_path)
@@ -183,15 +189,24 @@ def process_video(video_id):
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                     log_message("Memória da GPU liberada após a diarização.")
-        video.in_process = False
-        video.save()
+                video.process_times['diarization_end'] = format_datetime(datetime.now())
+        # video.in_process = False
+        # video.calculate_durations()
+        # video.save()
         os.remove(mp3_path)
         log_message(f"Arquivo de áudio {mp3_path} removido após a transcrição.")
     
     except Exception as e:
         log_message(f"Erro geral ao processar o vídeo {video_id}: {e}")
+        # video.in_process = False
+        # video.save()
+        # video.calculate_durations()
+    
+    finally:
         video.in_process = False
+        video.calculate_durations()
         video.save()
+
                 
 def process_videos_in_parallel(video_ids):
     """Processa múltiplos vídeos em paralelo."""
@@ -232,6 +247,10 @@ def worker():
 def add_video_to_queue(video_id):
     log_message(f"Adicionando vídeo {video_id} à fila.")
     video_queue.put(video_id)
+
+def format_datetime(dt):
+    """Converte um objeto datetime em uma string ISO 8601"""
+    return dt.strftime('%Y-%m-%d %H:%M:%S') if dt else None
 
 # Iniciar o worker em uma nova thread
 def start_worker():

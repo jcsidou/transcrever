@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% for video in videos %}
 <div id="card-{{ video.id }}" class="card 
-    {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% else %}in-progress{% endif %}">
+    {% if video.is_transcribed %}transcribed{% elif video.error_on_convert %}convert-error{% elif video.error_on_transcript %}transcript-error{% elif not video.is_transcribed and not video.in_process%}queue-error{% else %}in-progress{% endif %}">
     <div>
         <h2 class="no-wrap">{{ video.file.name | sem_barra_video }}</h2>
     </div>

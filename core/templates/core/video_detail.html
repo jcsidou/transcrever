@@ -5,12 +5,6 @@
 {% block content %}
 <h2>{{ video.file.name | sem_barra_video  }}</h2>
 <p class="model_info">({{video.get_model_display}})</p>
-{% comment %} <div class="model_info">(Transcrito com modelo {{video.get_model_display}})</div>
-<div class="video_div">
-    <video id="videoPlayer" controls preload="auto">
-        <source src="{{ video.file.url }}" type="video/mp4">
-    </video>
-</div> {% endcomment %}
 
 <div id="videoContainer" style="display: none;">
     <div class="video_div">
@@ -19,6 +13,7 @@
         </video>
     </div>
 </div>
+
 <div class="flex-container">
     <div>
         <a href="{% url 'generate_docx' video.id %}" class="btn">Baixar Transcrição</a>
@@ -32,9 +27,11 @@
         <input type="checkbox" id="toggleVideo" class="toggle-button">
     </div>
 </div>
+
 <div id="transcriptionTableContainer">
     {% include 'core/partials/transcription_table.html' %}
 </div>
+
 <hr>
 <div id="qaSection">
     <form id="qaForm" method="post">
@@ -49,6 +46,7 @@
         <p>Nenhuma resposta foi gerada.</p>
     </div>
 </div>
+
 <div id="loadingPopup" class="popup-overlay">
     <div class="popup-content centered-pop-up">
         <span id="closeLoadingPopup" class="close-btn">&times;</span>

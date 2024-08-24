@@ -121,7 +121,6 @@ button:hover, .btn:hover {
 
 /* Card Style */
 .card {
-    /* border: 2px solid white; */
     border-radius: 8px;
     padding: 16px;
     background-color: #ffbd00;
@@ -214,9 +213,9 @@ button.disabled:hover {
 }
 
 /* Class for Conversion Error */
-.transcript-error {
-    border-color: darkred solid 2px;
-    background-color: #777;
+.transcript-error, .convert-error, .queue-error {
+    border: darkred solid 2px;
+    background-color: #333;
 }
 
 .model_info {

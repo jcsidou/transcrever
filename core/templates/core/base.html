@@ -51,12 +51,15 @@
                             <option value="base">Básico</option>
                         </select>
                     </div>
+                    <div>
+                        <p>{{ form.diarize.label_tag }} {{ form.diarize }}</p>
+                    </div>
                     <button type="submit" class="btn flex-button">Transcrever</button>
                 </div>
             </form>
             <hr>
             <h2> Lembre-se: </h2>
-            Quanto maior o modelo, maior a precisão e, também, o tempo exigido para a transcrição. </br>
+            Quanto maior a precisão, maior o tempo exigido para a transcrição. </br>
             <ul>
                 <li> O modelo <strong>básico</strong> apresenta resultados limitados quando a qualidade do áudio não é ideal.</li></br>
                 <li> O modelo <strong>médio</strong> apresenta resultados e tempo de resposta adequado a boa parte das situações mais comuns.</li></br>
