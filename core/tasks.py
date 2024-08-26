@@ -1,6 +1,8 @@
 import json
 import os
 from pydub import AudioSegment
+import numpy as np
+import noisereduce as nr
 from .models import Video
 import whisper
 import logging
@@ -73,7 +75,25 @@ def process_video(video_id):
             log_message(f"Erro na conversão do vídeo {video_id} para MP3: {convert_error}")
             video.save()
             return  # Interromper o processo se a conversão falhar
-
+        
+        # try:
+        #     log_message(f"Iniciando a limpeza do ruido de fundo do arquivo {mp3_path}...")
+        #     audio = AudioSegment.from_mp3(mp3_path)
+        #     samples = np.array(audio.get_array_of_samples()).astype(np.float32)
+        #     if audio.channels == 2:
+        #         samples = samples.reshape((-1, 2))
+        #     reduced_noise = nr.reduce_noise(y=samples, sr=audio.frame_rate)
+        #     cleaned_audio = AudioSegment(
+        #         reduced_noise.tobytes(),
+        #         frame_rate=audio.frame_rate,
+        #         sample_width=audio.sample_width,
+        #         channels=1
+        #         )
+        #     cleaned_audio.export(mp3_path, format="mp3")
+        #     log_message(f"Arquivo {mp3_path} limpo com sucesso.")
+        # except:
+        #     log_message(f"Erro ao limpar o arquivo {mp3_path}...")
+        
         try:
             # Realizar a transcrição usando o arquivo MP3
             log_message(f"Iniciando a transcrição do Vídeo {video_id}...")
