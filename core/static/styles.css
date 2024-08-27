@@ -102,6 +102,7 @@ button, .btn, .delete-btn {
     box-shadow: black 4px 4px 8px;
     /* min-width: 60px; */
     font-size:medium;
+    border-radius: 8px;
 }
 .btn {
     border-radius: 8px;
@@ -208,9 +209,24 @@ button.disabled:hover {
 .nav-logo-td {align-items: left; border: 0px;}
 .nav-logo-btn{align-items: right; border: 0px; align-content: rigth; text-align: right;}
 
-.delete-btn:hover {
+
+.delete-btn:hover{
     background-color: #c82333;
 }
+
+.flex-container.gallery-button-line button {
+ flex-grow:0;
+ flex-shrink: 3;
+ gap: 10px;
+ width: 45%;
+ text-align: center;
+}
+.flex-container.gallery-button-line button:hover {
+    /* Your styles here */
+ flex-grow:4;
+ flex-shrink: 0;
+}
+
 
 /* Class for Conversion Error */
 .transcript-error, .convert-error, .queue-error {
