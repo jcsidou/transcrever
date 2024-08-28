@@ -204,8 +204,8 @@ button.disabled:hover {
 .card:hover {
     transform: translateY(-5px) translateX(5px);
     transition: all 0.5s ease-in-out;
-    box-shadow: #aaa 4px 4px 4px;
-    background: #888;
+    box-shadow: #111 4px 4px 4px;
+    background: #777;
 }
 
 .navbar-logo {
