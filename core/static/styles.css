@@ -110,6 +110,8 @@ button, .btn, .delete-btn {
 
 button:hover, .btn:hover {
     background-color: blue;
+    text-shadow: #111 2px 2px 2px;  
+    transition: all 0.5s ease-in-out;
 }
 
 /* Grid Container */
@@ -200,8 +202,10 @@ button.disabled:hover {
 
 /* Hover Effect */
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) translateX(5px);
     transition: all 0.5s ease-in-out;
+    box-shadow: #aaa 4px 4px 4px;
+    background: #888;
 }
 
 .navbar-logo {
@@ -216,9 +220,14 @@ button.disabled:hover {
 .nav-logo-td {align-items: left; border: 0px;}
 .nav-logo-btn{align-items: right; border: 0px; align-content: rigth; text-align: right;}
 
-
+/* .delete-btn {color: transparent;
+    background-color: transparent;
+    box-shadow: none;
+} */
 .delete-btn:hover{
     background-color: #c82333;
+    color:white;
+    box-shadow: black 4px 4px 8px;
 }
 
 .flex-container.gallery-button-line button {
