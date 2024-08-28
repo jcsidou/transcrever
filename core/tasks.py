@@ -1,4 +1,3 @@
-import json
 import os
 from pydub import AudioSegment
 import numpy as np
@@ -10,7 +9,6 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import torch
 from pyannote.audio import Pipeline
-from celery import shared_task
 import pyannote.audio
 import threading
 from queue import Queue
@@ -25,11 +23,12 @@ log_message = lambda message: logging.info(f"{datetime.now().strftime('%Y-%m-%d 
 log_message(f"Dispositivo de processamento: {'GPU' if device == 'cuda' else 'CPU'}")
 
 # Defina o caminho para o diretório de áudios
-# AUDIO_DIR = os.path.join(os.path.dirname(__file__), 'audios')
 VIDEO_DIR = 'videos/'
 AUDIO_DIR = 'media/audios/'
+
 # Certifique-se de que o diretório de áudios existe
 os.makedirs(AUDIO_DIR, exist_ok=True)
+os.makedirs(VIDEO_DIR, exist_ok=True)
 
 # Fila de processamento
 video_queue = Queue()
@@ -84,10 +83,9 @@ def process_video(video_id):
             model = whisper.load_model(video.model).to(device)
             video.process_times['transcription_device'] = "GPU" if torch.cuda.is_available() else "CPU"
             video.process_times['transcription_start'] = format_datetime(datetime.now())
-            result = model.transcribe(mp3_path, fp16=False, language='pt', word_timestamps=True)  # Força a transcrição para Português do Brasil
+            result = model.transcribe(mp3_path, fp16=False, language='pt', word_timestamps=True) 
             video.process_times['transcription_end'] = format_datetime(datetime.now())
             video.process_times['model'] = video.model
-            video.process_times['lenght'] = video.duration
             log_message(f"Transcrição do Vídeo {video_id} concluída.")
             log_message(f"Salvando o texto...")
             video.transcription = result['text']
@@ -120,6 +118,7 @@ def process_video(video_id):
             audio_duration = len(audio) / 1000.0 
             audio_duration_timedelta = timedelta(seconds=audio_duration)
             video.duration = (datetime.min + audio_duration_timedelta).time()
+            video.process_times['lenght'] = len(audio)/1000
             log_message(f"Duração do áudio: {len(audio) / 1000} segundos")
             log_message(f"Máximo dB do áudio: {audio.max_dBFS}")
             
@@ -232,14 +231,14 @@ def is_gpu_available():
             return False
     return False
 
-@shared_task
-def process_video_task(video_id):
-    try:
-        video = Video.objects.get(id=video_id)
-        video.process_video()  # Supondo que você tenha um método `process_video` no modelo Video
-        log_message(f'Vídeo {video_id} processado com sucesso.')
-    except Video.DoesNotExist:
-        log_message(f'Vídeo {video_id} não encontrado para processamento.')
+# @shared_task
+# def process_video_task(video_id):
+#     try:
+#         video = Video.objects.get(id=video_id)
+#         video.process_video()  # Supondo que você tenha um método `process_video` no modelo Video
+#         log_message(f'Vídeo {video_id} processado com sucesso.')
+#     except Video.DoesNotExist:
+#         log_message(f'Vídeo {video_id} não encontrado para processamento.')
         
 def worker():
     while True:

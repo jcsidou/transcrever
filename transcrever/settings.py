@@ -136,5 +136,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL do Redis
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Pode ser o mesmo URL se estiver usando Redis como backend
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL do Redis
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Pode ser o mesmo URL se estiver usando Redis como backend

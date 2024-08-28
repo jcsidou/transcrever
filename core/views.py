@@ -3,13 +3,13 @@ from django.contrib import messages
 from django.conf import settings
 from .models import Video
 from .forms import VideoUploadForm
-from .tasks import process_video, add_video_to_queue
+from .tasks import add_video_to_queue
 from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta, time
 import docx
-import json
+# import json
 import logging
-import os
+# import os
 from docx import Document
 from docx.shared import Pt, Mm
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
@@ -17,7 +17,7 @@ from docx.oxml.ns import nsdecls
 from docx.oxml import OxmlElement, ns
 from .models import Video
 from itertools import groupby
-from .tasks import process_video_task  # Importa a tarefa Celery
+# from .tasks import process_video_task  # Importa a tarefa Celery
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering
 import torch
 from .tasks import video_queue

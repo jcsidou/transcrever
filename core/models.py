@@ -50,8 +50,6 @@ class Video(models.Model):
         diarization_start = parse_datetime(self.process_times.get('diarization_start'))
         diarization_end = parse_datetime(self.process_times.get('diarization_end'))
         
-        # durations = {}
-        print("process_times",self.process_times)
         if conversion_start and conversion_end:
             self.process_times['conversion_duration'] = (conversion_end - conversion_start).total_seconds()
 
@@ -68,7 +66,6 @@ class Video(models.Model):
             else:
                 self.process_times['total_duration'] = (transcription_end - conversion_start).total_seconds()
 
-        print("process_times",self.process_times)
             # Após calcular, salvar o modelo para persistir as mudanças
         self.save()
 

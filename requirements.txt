@@ -1,0 +1,12 @@
+Django>=3.2,<4.0
+whitenoise
+pydub
+numpy
+noisereduce
+torch
+transformers
+pyannote.audio
+python-decouple
+python-docx
+requests
+gunicorn
