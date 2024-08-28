@@ -64,6 +64,7 @@ def process_video(video_id):
 
             # Converter o vídeo para MP3 e salvar no diretório de áudios
             log_message(f"Iniciando a conversão do Vídeo {video_id} para MP3 em {mp3_path}...")
+            video.process_times['video'] = video.file.name
             video.process_times['conversion_start'] = format_datetime(datetime.now())
             audio = AudioSegment.from_file(video.file.path)
             audio.export(mp3_path, format="mp3")
@@ -76,24 +77,6 @@ def process_video(video_id):
             video.save()
             return  # Interromper o processo se a conversão falhar
         
-        # try:
-        #     log_message(f"Iniciando a limpeza do ruido de fundo do arquivo {mp3_path}...")
-        #     audio = AudioSegment.from_mp3(mp3_path)
-        #     samples = np.array(audio.get_array_of_samples()).astype(np.float32)
-        #     if audio.channels == 2:
-        #         samples = samples.reshape((-1, 2))
-        #     reduced_noise = nr.reduce_noise(y=samples, sr=audio.frame_rate)
-        #     cleaned_audio = AudioSegment(
-        #         reduced_noise.tobytes(),
-        #         frame_rate=audio.frame_rate,
-        #         sample_width=audio.sample_width,
-        #         channels=1
-        #         )
-        #     cleaned_audio.export(mp3_path, format="mp3")
-        #     log_message(f"Arquivo {mp3_path} limpo com sucesso.")
-        # except:
-        #     log_message(f"Erro ao limpar o arquivo {mp3_path}...")
-        
         try:
             # Realizar a transcrição usando o arquivo MP3
             log_message(f"Iniciando a transcrição do Vídeo {video_id}...")
@@ -103,6 +86,8 @@ def process_video(video_id):
             video.process_times['transcription_start'] = format_datetime(datetime.now())
             result = model.transcribe(mp3_path, fp16=False, language='pt', word_timestamps=True)  # Força a transcrição para Português do Brasil
             video.process_times['transcription_end'] = format_datetime(datetime.now())
+            video.process_times['model'] = video.model
+            video.process_times['lenght'] = video.duration
             log_message(f"Transcrição do Vídeo {video_id} concluída.")
             log_message(f"Salvando o texto...")
             video.transcription = result['text']

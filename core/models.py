@@ -43,7 +43,6 @@ class Video(models.Model):
         if not self.process_times:
             self.process_times = {}
         
-        print("CALCULAR")
         conversion_start = parse_datetime(self.process_times.get('conversion_start'))
         conversion_end = parse_datetime(self.process_times.get('conversion_end'))
         transcription_start = parse_datetime(self.process_times.get('transcription_start'))
@@ -54,20 +53,16 @@ class Video(models.Model):
         # durations = {}
         print("process_times",self.process_times)
         if conversion_start and conversion_end:
-            print("CALCULAR DURAÇÃO")
             self.process_times['conversion_duration'] = (conversion_end - conversion_start).total_seconds()
 
         if transcription_start and transcription_end:
-            print("CALCULAR TRANSCRIÇAO")
             self.process_times['transcription_duration'] = (transcription_end - transcription_start).total_seconds()
 
         if diarization_start and diarization_end:
-            print("CALCULAR DIARIZAÇÃO")
             self.process_times['diarization_duration'] = (diarization_end - diarization_start).total_seconds()
 
         # Cálculo do tempo total de processamento
         if conversion_start and (diarization_end or transcription_end):
-            print("CALCULAR TOTAL")
             if diarization_end:
                 self.process_times['total_duration'] = (diarization_end - conversion_start).total_seconds()
             else:
