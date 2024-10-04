@@ -5,10 +5,12 @@ class modelos(models.Model):
     nome = models.CharField(max_length=50)
 
 MODEL_CHOICES = (
-    ("large-v3", "Grande aprimorado"),
+    ("large-v3-turbo", "Grande ++"),
+    ("large-v3", "Grande +"),
     ("large", "Grande"),
     ("medium", "Médio"),
     ("base", "Básico"),
+    
 )
 
 class Video(models.Model):

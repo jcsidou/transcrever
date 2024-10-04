@@ -217,9 +217,6 @@ def process_videos_in_parallel(video_ids):
     with ThreadPoolExecutor() as executor:
         executor.map(process_video, video_ids)
 
-# Exemplo de uso:
-# video_ids = [1, 2, 3, 4, 5]  # IDs dos vídeos que você quer processar
-# process_videos_in_parallel(video_ids)
 
                 
 def is_gpu_available():

@@ -45,7 +45,8 @@
                     <div>Escolher arquivo: <input type="file" name="file" required></div>
                     <div>Selecionar o modelo:
                         <select name="model" required>
-                            <option value="large-v3">Grande aprimorado</option>
+                            <option value="large-v3-turbo">Grande ++</option>
+                            <option value="large-v3">Grande +</option>
                             <option value="large">Grande</option>
                             <option value="medium">Médio</option>
                             <option value="base">Básico</option>
@@ -64,11 +65,12 @@
                 <li> O modelo <strong>básico</strong> apresenta resultados limitados quando a qualidade do áudio não é ideal.</li></br>
                 <li> O modelo <strong>médio</strong> apresenta resultados e tempo de resposta adequado a boa parte das situações mais comuns.</li></br>
                 <li> O modelo <strong>grande</strong> tem maior qualidade, mas exige maior tempo de processamento.</li></br>
-                <li> O modelo <strong>grande aprimorado</strong>, em geral, tem resultados bastante próximos ao do modelo grande, exigindo um tempo de processamento significativamente maior.</li></br>
+                <li> O modelo <strong>grande +</strong>, em geral, tem resultados bastante próximos ao do modelo grande, exigindo um tempo de processamento significativamente maior.</li></br>
+                <li> O modelo <strong>grande ++</strong> tem qualidade semelhante ao grande+, e é bastante mais rápido.</li></br>
             </ul>
             <div id="loadingIndicator" style="display:none;">
                 <p>Carregando o vídeo para transcrição...</p>
-                <p> Por favor, aguarde.</p>
+                <p>Por favor, aguarde.</p>
                 <div class="spinner"></div> <!-- Spinner de carregamento -->
             </div>
         </div>
